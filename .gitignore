@@ -1,0 +1,189 @@
+############################
+# OS SYSTEM FILES
+############################
+
+# macOS
+.DS_Store
+.AppleDouble
+.LSOverride
+._*
+
+# Windows
+Thumbs.db
+ehthumbs.db
+Desktop.ini
+$RECYCLE.BIN/
+
+# Linux
+.*.swp
+*.swp
+*~
+.cache/
+
+
+############################
+# IDE / EDITOR
+############################
+
+# VS Code
+.vscode/*
+!.vscode/settings.json
+!.vscode/extensions.json
+
+# JetBrains (IntelliJ / PyCharm / WebStorm …)
+.idea/*
+!.idea/codeStyles/
+!.idea/runConfigurations/
+
+# Vim
+*.swp
+*.swo
+
+# Emacs
+*~
+.#*
+*.elc
+
+
+############################
+# GENERAL
+############################
+
+# Logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+
+# Temporary files
+*.tmp
+*.temp
+
+# Environment
+.env
+.env.*
+
+
+############################
+# NODE.JS
+############################
+
+node_modules/
+dist/
+build/
+.cache/
+.next/
+out/
+npm-debug.log
+yarn-error.log
+
+# TypeScript
+*.tsbuildinfo
+
+
+############################
+# PYTHON
+############################
+
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+*.ruff_cache/
+*.pytest_cache/
+*.mypy_cache/
+.env/
+.venv/
+venv/
+
+
+############################
+# JAVA
+############################
+
+*.class
+*.jar
+*.war
+*.ear
+*.iml
+out/
+build/
+target/
+
+
+############################
+# GO
+############################
+
+bin/
+pkg/
+*.exe
+*.test
+
+
+############################
+# RUST
+############################
+
+target/
+Cargo.lock (若為 library 可忽略)
+
+
+############################
+# C / C++
+############################
+
+*.o
+*.out
+*.obj
+*.so
+*.dll
+*.exe
+
+
+############################
+# SWIFT
+############################
+
+.build/
+DerivedData/
+
+
+############################
+# DOCKER
+############################
+
+docker-data/
+*.pid
+
+
+############################
+# MISC FRAMEWORKS
+############################
+
+# React / Vue / Next / Nuxt / Svelte
+.cache/
+dist/
+build/
+
+# Laravel
+/vendor/
+node_modules/
+storage/
+.env
+
+# Django
+/staticfiles/
+db.sqlite3
+
+
+############################
+# OTHER
+############################
+
+*.bak
+*.orig
+*.tmp
+*.temp
+

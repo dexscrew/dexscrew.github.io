@@ -1,0 +1,751 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+  <!-- Meta tags -->
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <!-- HTML Meta Tags -->
+  <title>Learning Dexterous Manipulation Skills from Imperfect Simulations</title>
+  <meta name="description" content="Learning Dexterous Manipulation Skills from Imperfect Simulations" />
+  <meta property="og:image" content="./imgs/teaser.png" />
+  <meta property="og:image:type" content="image/png" />
+  <meta property="og:type" content="website" />
+  <meta property="og:title" content="Learning Dexterous Manipulation Skills from Imperfect Simulations" />
+  <meta property="og:description"
+    content="We propose a framework for learning dexterous manipulation skills from imperfect simulations, demonstrating effectiveness on nut-bolt fastening and screwdriving tasks." />
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet"
+    integrity="sha384-1BmE4kWBq78iYhFldvKuhfTAU6auU8tT94WrHftjDbrCEXSU1oBoqyl2QvZ6jIW3" crossorigin="anonymous" />
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Lato:ital,wght@0,400;0,700;0,900&family=Varela+Round&display=swap" rel="stylesheet">
+  <link rel="icon"
+    href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🔩</text></svg>" />
+  <!-- Bootstrap JS -->
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"
+    integrity="sha384-ka7Sk0Gln4gmtz2MlQnikT1wXgYsOg+OMhuP+IlRH9sENBO0LRn5q+8nbTov4+1p"
+    crossorigin="anonymous"></script>
+  <!-- Customized style -->
+  <style>
+    html * {
+      color: #333;
+      font-family: "Lato", sans-serif;
+    }
+
+    body {
+      background-color: #ffffff;
+    }
+
+    table.results td {
+      color: #888;
+      font-size: 90%;
+    }
+
+    .mtitle {
+      margin-top: 0;
+      font-family: "Varela Round", sans-serif;
+      color: #000000;
+      font-size: 40px;
+      line-height: 60px;
+      font-weight: 600;
+      letter-spacing: 1px;
+    }
+
+    .msubtitle {
+      margin-top: -30px;
+      margin-bottom: -20px;
+      font-size: 23px;
+      line-height: 65px;
+      letter-spacing: 2px;
+    }
+
+    .mauthors {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      font-size: 16px;
+      font-weight: 400;
+      gap: 0.6rem;
+    }
+
+    .mauthors a {
+      text-decoration: none;
+    }
+
+    .mauthors a:hover {
+      text-decoration: none;
+    }
+
+    .mauthors_affiliation {
+      margin-bottom: 24px;
+      font-size: 16px;
+    }
+
+    .darker_bg {
+      padding-top: 32px;
+      padding-bottom: 32px;
+      background-color: #f5f5f5;
+    }
+
+    .nav-link {
+      color: #333;
+    }
+
+    .nav-link a:hover,
+    a:hover,
+    a:active {
+      color: #888 !important;
+    }
+
+    .video-container {
+      position: relative;
+      width: 100%;
+      border-radius: 1rem;
+      overflow: hidden;
+      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
+      margin-bottom: 2rem;
+    }
+
+    .video-container video {
+      width: 100%;
+      display: block;
+    }
+
+    /* 讓所有 section 的 h3 置中（不含最上面的大標） */
+    .my-5 h3 {
+      text-align: center;
+    }
+
+    /* === Slider core === */
+    .slider-wrapper {
+      position: relative;
+      width: 100%;
+      max-width: 850px;      /* video 可視寬度 */
+      margin: 2rem auto;     /* 置中 */
+    }
+
+    .slider-container {
+      width: 100%;
+      aspect-ratio: 16 / 9;
+      background: #000;
+      overflow: hidden;
+      border-radius: 1rem;
+      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
+    }
+
+    .slider-track {
+      display: flex;
+      width: 100%;
+      height: 99.5%;
+      transition: transform 0.45s ease-in-out;
+    }
+
+    .slide-video {
+      flex: 0 0 100%;
+      width: 100%;
+      height: 100%;
+      object-fit: contain;
+      display: block;
+    }
+
+    .quick-links {
+    text-align: center;
+    margin-top: -10px;
+    margin-bottom: -10px;
+    }
+
+    .quick-links a {
+      margin: 0 2.5rem;
+      text-decoration: underline;
+    }
+
+    /* Remove underline from the parenthesis part */
+    /* .quick-links a span.no-underline {
+      text-decoration: none;
+    } */
+
+    .nav-arrow {
+      position: absolute;
+      top: 50%;
+      transform: translateY(-50%);
+      font-size: 2rem;
+      padding: 0.5rem 0.9rem;
+      line-height: 1;
+      border-radius: 999px;
+      background: #333;
+      color: white;
+      border: none;
+      cursor: pointer;
+      transition: background 0.3s ease, box-shadow 0.3s ease;
+      z-index: 2;
+      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.25);
+    }
+
+    .nav-arrow-left {
+      left: -40px;   /* 箭頭視覺上在外面，不影響 video 對齊 */
+    }
+
+    .nav-arrow-right {
+      right: -40px;
+    }
+
+    @media (max-width: 768px) {
+      .nav-arrow-left {
+        left: -20px;
+      }
+
+      .nav-arrow-right {
+        right: -20px;
+      }
+    }
+
+    .nav-arrow:hover {
+      background: #555;
+    }
+
+    .slider-indicators {
+      display: flex;
+      justify-content: center;
+      gap: 0.6rem;
+      margin-top: 0.75rem;
+    }
+
+    .slider-dot {
+      width: 10px;
+      height: 10px;
+      border-radius: 999px;
+      border: none;
+      background: #ccc;
+      padding: 0;
+      cursor: pointer;
+      transition: background 0.25s ease, transform 0.25s ease;
+    }
+
+    .slider-dot.active {
+      background: #333;
+      transform: scale(1.2);
+    }
+
+    /* .abstract-section {
+      background-color: #f9f9f9;
+      border-radius: 1rem;
+      padding: 2rem;
+      margin: 2rem 0;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+    } */
+
+    .abstract-section p {
+      line-height: 1.8;
+      text-align: justify;
+    }
+  </style>
+</head>
+
+<body>
+  <div class="container-fluid my-5 mx-auto" style="max-width: 840px">
+    <div class="row">
+      <h1 class="display-12 text-center mtitle">
+        Learning Dexterous Manipulation Skills from Imperfect Simulations
+      </h1>
+    </div>
+
+
+    <div class="text-center mauthors" style="line-height: 1.6; margin-top: 1rem;">
+      <span class="author-block"><a href="https://elvishh77.github.io/">Elvis Hsieh</a><sup>*</sup>,</span>
+      <span class="author-block"><a href="https://wen-hanhsieh.github.io/">Wen-Han Hsieh</a><sup>*</sup>,</span>
+      <span class="author-block"><a href="https://wangyenjen.github.io/">Yen-Jen Wang</a><sup>*</sup>,</span>
+      <span class="author-block"><a href="https://toruowo.github.io/">Toru Lin</a>,</span>
+      <span class="author-block"><a href="https://people.eecs.berkeley.edu/~malik/">Jitendra Malik</a>,</span>
+      <span class="author-block"><a href="https://me.berkeley.edu/people/koushil-sreenath/">Koushil Sreenath</a><sup>†</sup>,</span>
+      <span class="author-block"><a href="https://haozhi.io/">Haozhi Qi</a><sup>†</sup></span>
+    </div>
+
+    <!-- Footnotes -->
+    <div class="text-center my-2" style="font-size: 0.85rem; color: #888;">
+      <sup>*</sup> Equal contribution (listed in alphabetical order). <sup>†</sup> Equal advising.
+    </div>
+
+    <!-- Affiliation -->
+    <div class="text-center mauthors_affiliation">
+      UC Berkeley
+    </div>
+
+    <div class="quick-links">
+      <a href="" target="_blank">
+        <svg style="width: 16px; height: 16px; vertical-align: middle; margin-right: 4px;" viewBox="0 0 24 24">
+          <path fill="currentColor"
+            d="M16 0H8C6.9 0 6 .9 6 2V18C6 19.1 6.9 20 8 20H20C21.1 20 22 19.1 22 18V6L16 0M20 18H8V2H15V7H20V18M4 4V22H20V24H4C2.9 24 2 23.1 2 22V4H4M10 10V12H18V10H10M10 14V16H15V14H10Z" />
+        </svg>
+        pdf
+      </a>
+      <a href="" target="_blank">
+        <svg style="width: 16px; height: 16px; vertical-align: middle; margin-right: 4px;" viewBox="0 0 24 24">
+          <path fill="currentColor"
+            d="M16 0H8C6.9 0 6 .9 6 2V18C6 19.1 6.9 20 8 20H20C21.1 20 22 19.1 22 18V6L16 0M20 18H8V2H15V7H20V18M4 4V22H20V24H4C2.9 24 2 23.1 2 22V4H4M10 10V12H18V10H10M10 14V16H15V14H10Z" />
+        </svg>
+        arxiv
+      </a>
+      <a href="https://github.com/x-robotics-lab/dexscrew">
+        <svg style="width: 16px; height: 16px; vertical-align: middle; margin-right: 4px;" viewBox="0 0 24 24">
+          <path fill="currentColor"
+            d="M12,2A10,10 0 0,0 2,12C2,16.42 4.87,20.17 8.84,21.5C9.34,21.58 9.5,21.27 9.5,21C9.5,20.77 9.5,20.14 9.5,19.31C6.73,19.91 6.14,17.97 6.14,17.97C5.68,16.81 5.03,16.5 5.03,16.5C4.12,15.88 5.1,15.9 5.1,15.9C6.1,15.97 6.63,16.93 6.63,16.93C7.5,18.45 8.97,18 9.54,17.76C9.63,17.11 9.89,16.67 10.17,16.42C7.95,16.17 5.62,15.31 5.62,11.5C5.62,10.39 6,9.5 6.65,8.79C6.55,8.54 6.2,7.5 6.75,6.15C6.75,6.15 7.59,5.88 9.5,7.17C10.29,6.95 11.15,6.84 12,6.84C12.85,6.84 13.71,6.95 14.5,7.17C16.41,5.88 17.25,6.15 17.25,6.15C17.8,7.5 17.45,8.54 17.35,8.79C18,9.5 18.38,10.39 18.38,11.5C18.38,15.32 16.04,16.16 13.81,16.41C14.17,16.72 14.5,17.33 14.5,18.26C14.5,19.6 14.5,20.68 14.5,21C14.5,21.27 14.66,21.59 15.17,21.5C19.14,20.16 22,16.42 22,12A10,10 0 0,0 12,2Z" />
+        </svg>
+        code (sim-to-real)
+      </a>
+      <a href="https://github.com/x-robotics-lab/skill-teleop">
+        <svg style="width: 16px; height: 16px; vertical-align: middle; margin-right: 4px;" viewBox="0 0 24 24">
+          <path fill="currentColor"
+            d="M12,2A10,10 0 0,0 2,12C2,16.42 4.87,20.17 8.84,21.5C9.34,21.58 9.5,21.27 9.5,21C9.5,20.77 9.5,20.14 9.5,19.31C6.73,19.91 6.14,17.97 6.14,17.97C5.68,16.81 5.03,16.5 5.03,16.5C4.12,15.88 5.1,15.9 5.1,15.9C6.1,15.97 6.63,16.93 6.63,16.93C7.5,18.45 8.97,18 9.54,17.76C9.63,17.11 9.89,16.67 10.17,16.42C7.95,16.17 5.62,15.31 5.62,11.5C5.62,10.39 6,9.5 6.65,8.79C6.55,8.54 6.2,7.5 6.75,6.15C6.75,6.15 7.59,5.88 9.5,7.17C10.29,6.95 11.15,6.84 12,6.84C12.85,6.84 13.71,6.95 14.5,7.17C16.41,5.88 17.25,6.15 17.25,6.15C17.8,7.5 17.45,8.54 17.35,8.79C18,9.5 18.38,10.39 18.38,11.5C18.38,15.32 16.04,16.16 13.81,16.41C14.17,16.72 14.5,17.33 14.5,18.26C14.5,19.6 14.5,20.68 14.5,21C14.5,21.27 14.66,21.59 15.17,21.5C19.14,20.16 22,16.42 22,12A10,10 0 0,0 12,2Z" />
+        </svg>
+        code (skill-teleop)
+      </a>
+    </div>
+
+    
+
+    <!-- ===================== -->
+    <!-- Slider 0: Overview   -->
+    <!-- ===================== -->
+    <div style="margin-top: 0rem; margin-bottom: 2rem;">
+      <div class="slider-wrapper">
+        <div class="slider-container">
+          <div class="slider-track" id="tldr-track">
+
+            <video class="slide-video" id="tldr-video-7" muted autoplay loop playsinline controls>
+              <source src="./videos/sc_dist_4x_h264.mp4">
+            </video>
+
+            <video class="slide-video" id="tldr-video-6" muted autoplay loop playsinline controls>
+              <source src="./videos/p1_sc2_txt_compressed.mov">
+            </video>
+
+            <video class="slide-video" id="tldr-video-5" muted autoplay loop playsinline controls>
+              <source src="./videos/p1_sc1_txt_compressed.mov">
+            </video>
+
+
+
+            <video class="slide-video" id="tldr-video-4" muted autoplay loop playsinline controls>
+              <source src="./videos/bn_dist_4x_h264.mp4">
+            </video>
+
+            <video class="slide-video" id="tldr-video-0" muted autoplay loop playsinline controls>
+              <source src="./videos/bn_gen_box_x4_txt_compressed.mov">
+            </video>
+
+            <video class="slide-video" id="tldr-video-1" muted autoplay loop playsinline controls>
+              <source src="./videos/bn_gen_cross_x4_txt_compressed.mov">
+            </video>
+
+            <video class="slide-video" id="tldr-video-2" muted autoplay loop playsinline controls>
+              <source src="./videos/bn_gen_hex_x4_txt_compressed.mov">
+            </video>
+
+            <video class="slide-video" id="tldr-video-3" muted autoplay loop playsinline controls>
+              <source src="./videos/bn_gen_tri_x4_txt_compressed.mov">
+            </video>
+
+
+          </div>
+        </div>
+
+        <button id="tldr-prev" type="button" class="nav-arrow nav-arrow-left">‹</button>
+        <button id="tldr-next" type="button" class="nav-arrow nav-arrow-right">›</button>
+
+        <div class="slider-indicators" id="tldr-indicators"></div>
+      </div>
+    </div>
+
+    <div class="row">
+      <!-- <p class="text-center mb-2" style="font-weight: 700;">
+        TLDR:
+      </p> -->
+      <h5 class="text-center">TLDR:</h5>
+      <p class="text-center" style="font-size: 1rem; font-weight: 500; margin-top: 0px;">
+        We learn rotational motion in a simplified simulator, use it for skill-based teleoperation to collect multisensory data, and train a policy that performs screwdriving and nut-bolt fastening in the real world.
+      </p>
+      <div class="col-md-12 mt-4">
+        <center>
+          <img src="imgs/screw_teaser-2.png" alt="teaser" style="width: 100%; border-radius: 0.5rem; box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);">
+        </center>
+      </div>
+    </div>
+
+    <!-- <div class="row mt-1 text-center" style="margin-bottom: 0rem;">
+      <a class="nav-link col-4"></a>
+      <a href="#" class="nav-link col-2" style="padding: 0.1rem 0;">
+        <svg style="width: 30px; height: 30px" viewBox="0 0 24 24">
+          <path fill="currentColor"
+            d="M16 0H8C6.9 0 6 .9 6 2V18C6 19.1 6.9 20 8 20H20C21.1 20 22 19.1 22 18V6L16 0M20 18H8V2H15V7H20V18M4 4V22H20V24H4C2.9 24 2 23.1 2 22V4H4M10 10V12H18V10H10M10 14V16H15V14H10Z" />
+        </svg>
+        <div style="font-size: 12px; margin-top: 1px;">Paper</div>
+      </a>
+      <a href="#" class="nav-link col-2" style="padding: 0.1rem 0;">
+        <svg style="width: 30px; height: 30px" viewBox="0 0 24 24">
+          <path fill="currentColor"
+            d="M12,2A10,10 0 0,0 2,12C2,16.42 4.87,20.17 8.84,21.5C9.34,21.58 9.5,21.27 9.5,21C9.5,20.77 9.5,20.14 9.5,19.31C6.73,19.91 6.14,17.97 6.14,17.97C5.68,16.81 5.03,16.5 5.03,16.5C4.12,15.88 5.1,15.9 5.1,15.9C6.1,15.97 6.63,16.93 6.63,16.93C7.5,18.45 8.97,18 9.54,17.76C9.63,17.11 9.89,16.67 10.17,16.42C7.95,16.17 5.62,15.31 5.62,11.5C5.62,10.39 6,9.5 6.65,8.79C6.55,8.54 6.2,7.5 6.75,6.15C6.75,6.15 7.59,5.88 9.5,7.17C10.29,6.95 11.15,6.84 12,6.84C12.85,6.84 13.71,6.95 14.5,7.17C16.41,5.88 17.25,6.15 17.25,6.15C17.8,7.5 17.45,8.54 17.35,8.79C18,9.5 18.38,10.39 18.38,11.5C18.38,15.32 16.04,16.16 13.81,16.41C14.17,16.72 14.5,17.33 14.5,18.26C14.5,19.6 14.5,20.68 14.5,21C14.5,21.27 14.66,21.59 15.17,21.5C19.14,20.16 22,16.42 22,12A10,10 0 0,0 12,2Z" />
+        </svg>
+        <div style="font-size: 12px; margin-top: 1px;">Code</div>
+      </a>
+      <a class="nav-link col-4"></a>
+    </div> -->
+
+    <!-- ===================== -->
+    <!-- Slider 1: Bolt-nut   -->
+    <!-- ===================== -->
+    <!-- <div class="my-5">
+      <h3 class="mt-4 mb-3">Bolt-nut (4x speed)</h3>
+
+      <div class="slider-wrapper">
+        <div class="slider-container">
+          <div class="slider-track" id="bn-track">
+            <video class="slide-video" id="bn-video-0" muted autoplay loop playsinline controls>
+              <source src="./videos/bn_gen_box_4x_compressed.mov">
+            </video>
+
+            <video class="slide-video" id="bn-video-1" muted autoplay loop playsinline controls>
+              <source src="./videos/bn_gen_cross_4x_compressed.mov">
+            </video>
+
+            <video class="slide-video" id="bn-video-2" muted autoplay loop playsinline controls>
+              <source src="./videos/bn_gen_hex_4x_compressed.mov">
+            </video>
+
+            <video class="slide-video" id="bn-video-3" muted autoplay loop playsinline controls>
+              <source src="./videos/bn_gen_tri_4x_compressed.mov">
+            </video>
+          </div>
+        </div>
+
+        <button id="bn-prev" type="button" class="nav-arrow nav-arrow-left">‹</button>
+        <button id="bn-next" type="button" class="nav-arrow nav-arrow-right">›</button>
+
+        <div class="slider-indicators" id="bn-indicators"></div>
+      </div>
+    </div> -->
+
+    <!-- ===================== -->
+    <!-- Slider 2: Screwdriver -->
+    <!-- ===================== -->
+    <!-- <div class="my-5">
+      <h3 class="mt-4 mb-3">Screwdriver</h3>
+
+      <div class="slider-wrapper">
+        <div class="slider-container">
+          <div class="slider-track" id="sc-track">
+            <video class="slide-video" id="sc-video-0" muted autoplay loop playsinline controls>
+              <source src="./videos/p1_sc1_compressed.mov">
+            </video>
+
+            <video class="slide-video" id="sc-video-1" muted autoplay loop playsinline controls>
+              <source src="./videos/p1_sc2_compressed.mov">
+            </video>
+          </div>
+        </div>
+
+        <button id="sc-prev" type="button" class="nav-arrow nav-arrow-left">‹</button>
+        <button id="sc-next" type="button" class="nav-arrow nav-arrow-right">›</button>
+
+        <div class="slider-indicators" id="sc-indicators"></div>
+      </div>
+    </div> -->
+
+    <!-- 下面內容都維持你原本的版型，我只貼一次（沒動到結構） -->
+
+    <!-- <div class="my-5">
+      <h3 class="mt-4 mb-3">Robustness Test (4x speed)</h3>
+      
+      <div class="row mt-4">
+        <div class="col-md-6">
+          <h5 class="text-center mb-3">Bolt-nut</h5>
+          <div class="video-container">
+            <video autoplay muted loop playsinline controls preload="metadata">
+              <source src="./videos/bn_dist_4x_h264.mp4">
+            </video>
+          </div>
+        </div>
+
+        <div class="col-md-6">
+          <h5 class="text-center mb-3">Screwdriver</h5>
+          <div class="video-container">
+            <video autoplay muted loop playsinline controls preload="metadata">
+              <source src="./videos/sc_dist_4x_h264.mp4">
+            </video>
+          </div>
+        </div>
+      </div>
+    </div> -->
+
+    <div class="my-5">
+      <h3 class="mt-4 mb-3">Stage 1: Simulation</h3>
+      <img src="./imgs/stage1.svg" alt="Stage 1" style="width: 100%;">
+      <p class="text-center" style="margin-top: 0.8rem; font-size: 1.0rem">
+        We train a transferable rotational motion policy in simulator.
+      </p>
+      <div class="row mt-4">
+        <div class="col-md-6">
+          <h5 class="text-center mb-3">Simulation objects</h5>
+          <img src="./imgs/sim_obj.svg" alt="Simulation objects" style="width: 100%;">
+
+        </div>
+
+        <div class="col-md-6">
+          <h5 class="text-center mb-3">Simulation Training</h5>
+          <div class="video-container">
+            <video autoplay muted loop playsinline controls preload="metadata">
+              <source src="./videos/sim_30x.mov">
+            </video>
+          </div>
+        </div>
+      </div>
+    </div>
+    
+
+    <div class="my-5">
+      <h3 class="mt-4 mb-3">Stage 2: Teleoperation</h3>
+      <img src="./imgs/stage2.svg" alt="Stage 2" style="width: 100%;">
+      <p class="text-center" style="margin-top: 0.8rem; font-size: 1.0rem">
+        We use the trained rotational motion policy for skill-based teleoperation to collect multisensory data.
+      </p>
+      <div class="row mt-4">
+        <div class="col-md-6">
+          <h5 class="text-center mb-3">Screwdriver</h5>
+          <div class="video-container">
+            <video autoplay muted loop playsinline controls preload="metadata">
+              <source src="./videos/sc_teleop_4x_compressed.mov">
+            </video>
+          </div>
+        </div>
+
+        <div class="col-md-6">
+          <h5 class="text-center mb-3">Bolt-nut</h5>
+          <div class="video-container">
+            <video autoplay muted loop playsinline controls preload="metadata">
+              <source src="./videos/bn_teleop_4x_compressed.mov">
+            </video>
+          </div>
+        </div>
+      </div>
+    </div>
+    
+    <div class="my-5">
+
+      <h3 class="mt-4 mb-3">Stage 3: Multisensory Policy</h3>
+      <img src="./imgs/stage3.svg" alt="Stage 3" style="width: 100%;">
+      <p class="text-center" style="margin-top: 0.8rem; font-size: 1.0rem">
+        We distill the multisensory data into single policy for screwdriving and nut-bolt fastening.
+      </p>
+      <div class="row mt-4">
+        <div class="col-md-6">
+          <h5 class="text-center mb-3">Tactile-Aware</h5>
+          <div class="video-container">
+            <video autoplay muted loop playsinline controls preload="metadata">
+              <source src="./videos/sc_th_10x_compressed.mov">
+            </video>
+          </div>
+        </div>
+
+        <div class="col-md-6">
+          <h5 class="text-center mb-3">Non-Tactile</h5>
+          <div class="video-container">
+            <video autoplay muted loop playsinline controls preload="metadata">
+              <source src="./videos/sc_t_10x_compressed.mov">
+            </video>
+          </div>
+        </div>
+      </div>
+
+      <div class="row mt-4">
+        <div class="col-md-6">
+          <h5 class="text-center mb-3">Tactile-Aware</h5>
+          <div class="video-container">
+            <video autoplay muted loop playsinline controls preload="metadata">
+              <source src="./videos/bn_th_5x_compressed.mov">
+            </video>
+          </div>
+        </div>
+
+        <div class="col-md-6">
+          <h5 class="text-center mb-3">Non-Tactile</h5>
+          <div class="video-container">
+            <video autoplay muted loop playsinline controls preload="metadata">
+              <source src="./videos/bn_t_5x_compressed.mov">
+            </video>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="my-5">
+
+      <h4 class="mt-4 mb-3">Ablation: Tactile Feedback with Temporal Context</h4>
+      <p class="text-left" style="margin-top: 0.8rem; font-size: 1.0rem">
+        We compare the performance of the tactile-aware and non-tactile policies without temporal context below. Tactile feedback is best to interpreted with temporal context.
+      </p>
+      <div class="row mt-4">
+        <div class="col-md-6">
+          <h5 class="text-center mb-3">Tactile-Aware</h5>
+          <div class="video-container">
+            <video autoplay muted loop playsinline controls preload="metadata">
+              <source src="./videos/sc_t_10x_compressed.mov">
+            </video>
+          </div>
+        </div>
+
+        <div class="col-md-6">
+          <h5 class="text-center mb-3">Non-Tactile</h5>
+          <div class="video-container">
+            <video autoplay muted loop playsinline controls preload="metadata">
+              <source src="./videos/sc_p_x10_compressed.mov">
+            </video>
+          </div>
+        </div>
+      </div>
+
+      <div class="row mt-4">
+        <div class="col-md-6">
+          <h5 class="text-center mb-3">Tactile-Aware</h5>
+          <div class="video-container">
+            <video autoplay muted loop playsinline controls preload="metadata">
+              <source src="./videos/bn_t_5x_compressed.mov">
+            </video>
+          </div>
+        </div>
+
+        <div class="col-md-6">
+          <h5 class="text-center mb-3">Non-Tactile</h5>
+          <div class="video-container">
+            <video autoplay muted loop playsinline controls preload="metadata">
+              <source src="./videos/bn_p_5x_compressed.mov">
+            </video>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="my-5">
+      <h3 class="mt-4 mb-3">Tactile Visualization</h3>
+      <div class="row mt-4">
+        <div class="col-md-6">
+          <h5 class="text-center mb-3">Screwdriver</h5>
+          <div class="video-container">
+            <video autoplay muted loop playsinline controls preload="metadata">
+              <source src="./videos/sc_tactile_vis_h264.mp4">
+            </video>
+          </div>
+        </div>
+
+        <div class="col-md-6">
+          <h5 class="text-center mb-3">Bolt-nut</h5>
+          <div class="video-container">
+            <video autoplay muted loop playsinline controls preload="metadata">
+              <source src="./videos/bn_tactile_vis_h264.mp4">
+            </video>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="my-4">
+      <div class="abstract-section">
+        <h4 class="mb-4">Acknowledgements</h4>
+        <p>
+          This work is supported in part by the program
+          "Design of Robustly Implementable Autonomous and Intelligent Machines (TIAMAT)",
+          Defense Advanced Research Projects Agency award number HR00112490425.
+          We thank Mengda Xu for their valuable feedback.
+        </p>
+      </div>
+    </div>
+
+    <div class="text-center mb-5">
+      <hr />
+      <small style="color: #666;">
+        Website inspired by
+        <a href="https://www.liruilong.cn/prope/" target="_blank">
+          PRoPE
+        </a>
+    </div>
+    
+  </div>
+
+  <script>
+    document.addEventListener('DOMContentLoaded', function () {
+      function makeSlider(videoIds, prevBtnId, nextBtnId, indicatorId, trackId) {
+        const prevBtn = document.getElementById(prevBtnId);
+        const nextBtn = document.getElementById(nextBtnId);
+        const indicatorContainer = document.getElementById(indicatorId);
+        const track = document.getElementById(trackId);
+
+        let index = 0;
+        const total = videoIds.length;
+
+        // 建立指示點
+        const dots = videoIds.map((_, i) => {
+          const dot = document.createElement('button');
+          dot.type = 'button';
+          dot.className = 'slider-dot' + (i === 0 ? ' active' : '');
+          dot.addEventListener('click', function () {
+            slideTo(i);
+          });
+          indicatorContainer.appendChild(dot);
+          return dot;
+        });
+
+        function updateIndicators() {
+          dots.forEach((d, i) => {
+            d.classList.toggle('active', i === index);
+          });
+        }
+
+        function slideTo(nextIndex) {
+          index = nextIndex;
+          track.style.transform = `translateX(-${index * 100}%)`;
+          updateIndicators();
+        }
+
+        prevBtn.addEventListener('click', function (e) {
+          e.preventDefault();
+          const next = (index - 1 + total) % total;
+          slideTo(next);
+        });
+
+        nextBtn.addEventListener('click', function (e) {
+          e.preventDefault();
+          const next = (index + 1) % total;
+          slideTo(next);
+        });
+      }
+
+      // TLDR slider
+      makeSlider(
+        ['tldr-video-0', 'tldr-video-1', 'tldr-video-2', 'tldr-video-3', 'tldr-video-4', 'tldr-video-5', 'tldr-video-6', 'tldr-video-7'],
+        'tldr-prev',
+        'tldr-next',
+        'tldr-indicators',
+        'tldr-track'
+      );
+
+      // Bolt-nut slider
+      makeSlider(
+        ['bn-video-0', 'bn-video-1', 'bn-video-2', 'bn-video-3'],
+        'bn-prev',
+        'bn-next',
+        'bn-indicators',
+        'bn-track'
+      );
+
+      // Screwdriver slider
+      makeSlider(
+        ['sc-video-0', 'sc-video-1'],
+        'sc-prev',
+        'sc-next',
+        'sc-indicators',
+        'sc-track'
+      );
+    });
+  </script>
+</body>
+
+</html>
