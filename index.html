@@ -112,7 +112,6 @@
       display: block;
     }
 
-    /* 讓所有 section 的 h3 置中（不含最上面的大標） */
     .my-5 h3 {
       text-align: center;
     }
@@ -121,8 +120,8 @@
     .slider-wrapper {
       position: relative;
       width: 100%;
-      max-width: 850px;      /* video 可視寬度 */
-      margin: 2rem auto;     /* 置中 */
+      max-width: 850px; 
+      margin: 2rem auto;
     }
 
     .slider-container {
@@ -183,7 +182,7 @@
     }
 
     .nav-arrow-left {
-      left: -40px;   /* 箭頭視覺上在外面，不影響 video 對齊 */
+      left: -40px;
     }
 
     .nav-arrow-right {
@@ -577,7 +576,6 @@
         let index = 0;
         const total = videoIds.length;
 
-        // 建立指示點
         const dots = videoIds.map((_, i) => {
           const dot = document.createElement('button');
           dot.type = 'button';
